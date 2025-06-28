@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ISHOWOP Quiz Challenge - 50 Tests</title>
+  <style>
+    :root {
+      --primary-bg: #121212;
+      --accent: rgba(20, 20, 20, 0.85);
+      --highlight: #03dac6;
+      --correct: #4caf50;
+      --wrong: #f44336;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: url('https://www.transparenttextures.com/patterns/cubes.png') repeat,
+                  linear-gradient(to right, #0f0f0f, #1c1c1c);
+      background-blend-mode: overlay;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      transition: background 0.5s;
+    }
+    .container {
+      background: var(--accent);
+      backdrop-filter: blur(8px);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      width: 90%;
+      max-width: 650px;
+      text-align: center;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    h1 {
+      color: var(--highlight);
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+    p {
+      font-size: 18px;
+      color: #ccc;
+    }
+    .options {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .option-button, .start-button, .retry-button {
+      padding: 14px;
+      font-size: 16px;
+      background-color: var(--highlight);
+      color: black;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .option-button:hover, .start-button:hover, .retry-button:hover {
+      background-color: #00bfa5;
+      transform: scale(1.02);
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="gameContainer">
+    <h1>ISHOWOP Quiz Challenge</h1>
+    <p>🎯 50 Randomized Tests — One wrong answer, back to Test 1!</p>
+    <button class="start-button" onclick="startGame()">Start Challenge</button>
+  </div>
+
+  <script>
+    const allQuestions = [
+      { q: "What does print(2 + 2) return?", a: "4", o: ["2", "3", "4", "5"] },
+      { q: "Which keyword defines a function?", a: "def", o: ["func", "def", "define", "function"] },
+      { q: "Which command shows current directory in Linux?", a: "pwd", o: ["cd", "pwd", "ls", "dir"] },
+      { q: "Which command deletes a file in Linux?", a: "rm", o: ["remove", "erase", "del", "rm"] },
+      { q: "CSS stands for?", a: "Cascading Style Sheets", o: ["Creative Styling System", "Cascading Style Sheets", "Color Sheet Style", "Custom Style Syntax"] },
+      { q: "HTML tag to insert a line break?", a: "br", o: ["br", "lb", "line", "break"] },
+      { q: "Binary of 5 is?", a: "101", o: ["110", "101", "100", "111"] },
+      { q: "XOR(1,0) gives?", a: "1", o: ["1", "0", "2", "Error"] },
+      { q: "1 OR 0 is?", a: "1", o: ["0", "1", "2", "Error"] },
+      { q: "NOT(0) gives?", a: "1", o: ["1", "0", "-1", "Error"] },
+      { q: "AND(1,1) gives?", a: "1", o: ["0", "1", "2", "Undefined"] },
+      { q: "Which Linux command creates a directory?", a: "mkdir", o: ["md", "create", "mkdir", "folder"] },
+      { q: "Python is a ____ language", a: "interpreted", o: ["compiled", "binary", "interpreted", "assembly"] },
+      { q: "HTML stands for?", a: "HyperText Markup Language", o: ["HyperText Markdown Language", "HyperText Markup Language", "Home Tool Markup", "Hyper Transfer"] },
+      { q: "Command to list files in Linux?", a: "ls", o: ["cd", "ls", "list", "show"] },
+      { q: "Which tag creates a heading?", a: "h1", o: ["h1", "head", "title", "h6"] },
+      { q: "In CSS, which property sets text color?", a: "color", o: ["text-color", "font-color", "color", "text-style"] },
+      { q: "Which tag creates a paragraph?", a: "p", o: ["para", "text", "p", "div"] },
+      { q: "Which symbol is used for ID in CSS?", a: "#", o: [".", "#", "*", "@"] },
+      { q: "Python operator for power/exponent?", a: "**", o: ["^", "*", "**", "%"] }
+    ];
+
+    let questions = [];
+    let test = 0;
+    const totalTests = 50;
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function startGame() {
+      questions = shuffleArray([...allQuestions]).slice(0, totalTests);
+      test = 0;
+      document.getElementById("gameContainer").innerHTML = `
+        <h1>Test <span id="testNum">1</span></h1>
+        <p id="question">Loading...</p>
+        <div class="options" id="options"></div>
+        <p id="message"></p>
+      `;
+      loadQuestion();
+    }
+
+    function changeBackground() {
+      const textures = [
+        'https://www.transparenttextures.com/patterns/cubes.png',
+        'https://www.transparenttextures.com/patterns/dark-mosaic.png',
+        'https://www.transparenttextures.com/patterns/black-linen.png',
+        'https://www.transparenttextures.com/patterns/purty-wood.png',
+        'https://www.transparenttextures.com/patterns/stardust.png'
+      ];
+      const image = textures[test % textures.length];
+      document.body.style.backgroundImage = `url('${image}'), linear-gradient(to right, #0f0f0f, #1c1c1c)`;
+    }
+
+    function loadQuestion() {
+      if (test >= questions.length) {
+        document.body.innerHTML = '<div class="container"><h1>🎉 Congratulations!</h1><p>You completed all 50 tests!</p></div>';
+        return;
+      }
+
+      changeBackground();
+      document.getElementById("testNum").innerText = test + 1;
+      document.getElementById("question").innerText = questions[test].q;
+
+      const optionsDiv = document.getElementById("options");
+      optionsDiv.innerHTML = "";
+
+      questions[test].o.forEach(option => {
+        const btn = document.createElement("button");
+        btn.innerText = option;
+        btn.className = "option-button";
+        btn.onclick = () => checkAnswer(option);
+        optionsDiv.appendChild(btn);
+      });
+
+      document.getElementById("message").innerText = "";
+    }
+
+    function checkAnswer(selected) {
+      const correct = questions[test].a.toLowerCase();
+      if (selected.toLowerCase() === correct) {
+        document.getElementById("message").style.color = "var(--correct)";
+        document.getElementById("message").innerText = `✅ Correct! Proceeding to Test ${test + 2}`;
+        setTimeout(() => {
+          test++;
+          loadQuestion();
+        }, 1000);
+      } else {
+        showGameOver();
+      }
+    }
+
+    function showGameOver() {
+      document.getElementById("gameContainer").innerHTML = `
+        <h1>😔 Oops!</h1>
+        <p>You reached <strong>Test ${test + 1}</strong>. Well done, but one wrong answer takes you back!</p>
+        <p>💡 Keep practicing and try again to beat all 50 tests!</p>
+        <button class="retry-button" onclick="startGame()">🔁 Retry Challenge</button>
+      `;
+    }
+  </script>
+</body>
+</html>
